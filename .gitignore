@@ -1,5 +1,5 @@
-
+*-journal
+.env
 .venv/
 __pycache__/
 *.pyc
-*-journal
