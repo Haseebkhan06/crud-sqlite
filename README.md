@@ -1,115 +1,82 @@
-# SQLite CRUD API
+# Tasks CRUD API with PostgreSQL and Docker
 
-A simple CRUD API built using Python, FastAPI, and SQLite. This project demonstrates how to create, read, update, and delete tasks using REST API endpoints and a persistent database.
+## About the Project
+
+This project is a simple task management API built using FastAPI. Initially, the application used SQLite to store tasks. As part of this assignment, I updated it to use PostgreSQL and Docker so the database can run separately from the application and keep its data even when the containers are restarted.
+
+The API allows users to create, view, update, and delete tasks.
 
 ## Technologies Used
 
-- Python
-- FastAPI
-- SQLite
-- Uvicorn
-- DB Browser for SQLite
-
-## Features
-
-- View all tasks
-- View a task by ID
-- Create a new task
-- Update an existing task
-- Delete a task
-- Store tasks persistently in SQLite
+- **Python and FastAPI** — to build the API
+- **PostgreSQL** — to store task data
+- **Psycopg** — to connect Python to PostgreSQL
+- **Docker** — to run the application and database in containers
+- **Docker Compose** — to start both services together
 
 ## Project Structure
 
-```text
-crud-sqlite/
-├── main.py
-├── tasks.db
-├── README.md
-└── .venv/  (virtual environment, if stored here)
+- `main.py` — contains the API routes and request handling.
+- `repository.py` — handles database operations such as creating, fetching, updating, and deleting tasks.
+- `init.sql` — contains the SQL command to create the tasks table.
+- `Dockerfile` — contains the instructions for building the application image.
+- `docker-compose.yml` — configures and starts the application and PostgreSQL database.
+- `.env` — stores local environment variables and database configuration.
+- `.env.example` — provides an example of the required environment variables.
+- `requirements.txt` — lists the Python packages needed to run the project.
+- `.gitignore` — prevents files such as `.env` and Python cache files from being committed.
+
+## How to Run the Project
+
+### 1. Configure the environment
+
+Create a `.env` file using `.env.example` as a reference. Add the required PostgreSQL password and database connection settings.
+
+### 2. Start the application
+
+Make sure Docker Desktop is running, then execute:
+
+```bash
+docker compose up --build -d
 ```
 
-## Database
+This builds the application image and starts the application and database containers.
 
-The database is named `tasks.db` and is located in the same directory as `main.py`.
+### 3. Open the API documentation
 
-The `tasks` table contains:
+Once the containers are running, visit:
 
-| Column | Type | Description |
-|---|---|---|
-| id | INTEGER | Primary key, automatically generated |
-| title | TEXT | Task title |
-| done | BOOLEAN | Completion status |
+http://localhost:8000/docs
 
-The application creates the table if it does not exist. It inserts three example tasks only when the table is empty.
+You can use this page to test the available API endpoints.
 
-## API Endpoints
+## Available Endpoints
 
-| Method | Endpoint | Description |
+| Method | Endpoint | Purpose |
 |---|---|---|
 | GET | `/tasks` | Get all tasks |
 | GET | `/tasks/{task_id}` | Get a task by ID |
-| POST | `/tasks` | Create a task |
-| PUT | `/tasks/{task_id}` | Update a task |
+| POST | `/tasks` | Create a new task |
+| PUT | `/tasks/{task_id}` | Update an existing task |
 | DELETE | `/tasks/{task_id}` | Delete a task |
 
-## Setup and Run
+## Database Persistence
 
-1. Install Python if it is not already installed.
-2. Open a terminal in the project directory.
-3. Install the dependencies:
+The PostgreSQL database uses a Docker volume to store its data outside the database container. This means the data can remain available even when the containers are stopped and recreated.
 
-   ```bash
-   python -m pip install fastapi uvicorn
-   ```
+I tested this by creating a task, stopping the containers, starting them again, and checking the database. The task was still present after the restart.
 
-4. Start the application:
+## Stopping the Application
 
-   ```bash
-   python -m uvicorn main:app --reload
-   ```
+To stop the containers, run:
 
-5. Open the interactive API documentation:
-
-   http://127.0.0.1:8000/docs
-
-## Example SQL Query
-
-To retrieve all tasks:
-
-```sql
-SELECT * FROM tasks;
+```bash
+docker compose down
 ```
 
-To retrieve completed tasks:
+The database volume is kept, so the stored data remains available when the application is started again.
 
-```sql
-SELECT * FROM tasks WHERE done = 1;
-```
+## Notes
 
-To count all tasks:
+Keep the `.env` file private and do not commit passwords or other sensitive configuration. Use `.env.example` when sharing the project so others know which environment variables they need to configure.
 
-```sql
-SELECT COUNT(*) FROM tasks;
-```
-
-## Database Viewer
-
-Open `tasks.db` using DB Browser for SQLite. Use the **Browse Data** tab to inspect the `tasks` table and the **Execute SQL** tab to run queries.
-
-Add a screenshot of your database table here before submitting.
-
-## Learning Outcome
-
-This project demonstrates REST API development with FastAPI, SQLite database operations, parameterized SQL queries, and CRUD functionality.
-
-## Screenshots
-
-
-### Tasks Database
-
-![Tasks database table](screenshot/database-table.png)
-
-### SQL Query Results
-
-![SQL query results](screenshot/sql-query.png)
